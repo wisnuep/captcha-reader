@@ -45,7 +45,11 @@ def ensure_model_downloaded():
             import gdown
             # gdown menangani file besar di Google Drive dengan benar
             # (melewati halaman peringatan "tidak bisa scan virus" untuk file >100MB)
-            gdown.download(model_url, MODEL_PATH, quiet=False, fuzzy=True)
+            try:
+                gdown.download(model_url, MODEL_PATH, quiet=False, fuzzy=True)
+            except TypeError:
+                # Versi gdown yang lebih lama/berbeda tidak punya argumen 'fuzzy'
+                gdown.download(model_url, MODEL_PATH, quiet=False)
 
             if not os.path.exists(MODEL_PATH):
                 raise RuntimeError("Download tidak menghasilkan file sama sekali.")

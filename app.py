@@ -125,7 +125,7 @@ def predict(model, device, image: Image.Image):
 
 
 def main():
-    st.title("🔐 CAPTCHA OCR Predictor")
+    st.title("🔐 Pembaca CAPTCHA")
     st.write("Upload gambar CAPTCHA (6 karakter), model akan menebak teksnya beserta tingkat keyakinannya.")
 
     if not ensure_model_downloaded():

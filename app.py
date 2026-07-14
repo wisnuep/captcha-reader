@@ -240,7 +240,7 @@ def main():
     st.markdown(
         """
         <div class="main-header">
-            <h1>🔐 CAPTCHA OCR Predictor</h1>
+            <h1>🔐 Pembaca Kode Captcha</h1>
             <p>Upload gambar CAPTCHA 6 karakter — model ResNet50 akan menebak teksnya beserta tingkat keyakinannya.</p>
         </div>
         """,

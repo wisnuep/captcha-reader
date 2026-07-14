@@ -40,13 +40,38 @@ def ensure_model_downloaded():
         return False
 
     os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
-    with st.spinner("Mengunduh model untuk pertama kali, mohon tunggu..."):
+    with st.spinner("Mengunduh model untuk pertama kali, mohon tunggu (bisa beberapa menit)..."):
         try:
-            import requests
-            resp = requests.get(model_url, timeout=120)
-            resp.raise_for_status()
-            with open(MODEL_PATH, "wb") as f:
-                f.write(resp.content)
+            import gdown
+            # gdown menangani file besar di Google Drive dengan benar
+            # (melewati halaman peringatan "tidak bisa scan virus" untuk file >100MB)
+            gdown.download(model_url, MODEL_PATH, quiet=False, fuzzy=True)
+
+            if not os.path.exists(MODEL_PATH):
+                raise RuntimeError("Download tidak menghasilkan file sama sekali.")
+
+            size_bytes = os.path.getsize(MODEL_PATH)
+            if size_bytes < 10_000_000:  # file model harusnya puluhan/ratusan MB
+                # Kemungkinan besar yang terdownload adalah halaman HTML (error/login), bukan file asli
+                with open(MODEL_PATH, "rb") as f:
+                    head = f.read(200)
+                os.remove(MODEL_PATH)
+                raise RuntimeError(
+                    f"File hasil download cuma {size_bytes} bytes (kemungkinan bukan file model asli, "
+                    f"tapi halaman error dari Google Drive). Cuplikan awal file: {head[:100]!r}. "
+                    "Pastikan sharing setting file di Drive sudah 'Anyone with the link'."
+                )
+
+            # Cek tanda file valid: torch.save (>=1.6) menyimpan sebagai file ZIP, harus diawali 'PK'
+            with open(MODEL_PATH, "rb") as f:
+                magic = f.read(4)
+            if magic[:2] != b"PK":
+                os.remove(MODEL_PATH)
+                raise RuntimeError(
+                    f"File yang terdownload ({size_bytes} bytes) bukan file checkpoint PyTorch yang valid "
+                    f"(magic bytes: {magic!r}, seharusnya diawali 'PK'). File kemungkinan corrupt/tidak lengkap."
+                )
+
             return True
         except Exception as e:
             st.error(f"Gagal mengunduh model: {e}")

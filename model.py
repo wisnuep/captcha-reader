@@ -56,7 +56,14 @@ def load_model(checkpoint_path, device="cpu"):
     - state_dict biasa hasil torch.save(model.state_dict(), ...) (.pth/.pt)
     """
     model = CaptchaModel()
-    checkpoint = torch.load(checkpoint_path, map_location=device)
+    # PyTorch >= 2.6 mengubah default `weights_only` menjadi True, yang menolak
+    # unpickle checkpoint Lightning (berisi objek non-tensor seperti hyperparameters).
+    # Kita set eksplisit weights_only=False karena ini file yang kita percaya (buatan sendiri).
+    try:
+        checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
+    except TypeError:
+        # Untuk versi torch lama yang belum mengenal argumen weights_only
+        checkpoint = torch.load(checkpoint_path, map_location=device)
 
     if isinstance(checkpoint, dict) and "state_dict" in checkpoint:
         state_dict = checkpoint["state_dict"]

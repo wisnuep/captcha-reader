@@ -9,7 +9,7 @@ from torchvision import transforms
 from model import CaptchaModel, load_model, DECODING_DICT, NORM_MEAN, NORM_STD
 
 st.set_page_config(
-    page_title="CAPTCHA OCR Predictor",
+    page_title="Pembaca Kode Captcha",
     page_icon="🔐",
     layout="centered",
 )

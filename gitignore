@@ -5,7 +5,5 @@ venv/
 .streamlit/secrets.toml
 .DS_Store
 
-# Jangan ignore model kecuali kamu memakai cara "download saat runtime" (lihat README).
-# Jika mau simpan model langsung di repo via Git LFS, hapus baris di bawah ini.
 # models/*.ckpt
 # models/*.pth
